@@ -54,3 +54,7 @@ storage/
 *.swp
 *.bak
 *.orig
+
+# Swagger
+swagger.json
+swagger.yaml
