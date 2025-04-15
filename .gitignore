@@ -1,0 +1,56 @@
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Output
+dist/
+build/
+
+# Env
+.env
+.env.*.local
+
+# Logs
+logs/
+*.log
+*.log.*
+
+# TypeScript
+*.tsbuildinfo
+
+# DB / TypeORM
+*.sqlite
+*.sqlite3
+typeorm*.ts
+/migration/*.ts
+
+# Swagger
+swagger.json
+swagger.yaml
+docs/swagger/*
+public/swagger/*
+swagger-static.json
+
+# IDE / Editor
+.vscode/
+.idea/
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Coverage / Test
+coverage/
+jest-html-reporters-*
+
+# Uploads / Media (ถ้ามี)
+uploads/
+public/uploads/
+storage/
+
+# Misc
+*.swp
+*.bak
+*.orig
