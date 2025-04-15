@@ -22,4 +22,4 @@ const options: DataSourceOptions & SeederOptions = {
   seeds: ['src/database/seeds/*{.ts,.js}'],
 }
 
-export const PostgresDataSource = new DataSource(options)
+export const AppDataSource = new DataSource(options)
