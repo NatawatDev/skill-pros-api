@@ -67,13 +67,21 @@ const getLabsById = async (req: Request, res: Response, next: NextFunction) => {
  *                 type: string
  *                 example: "Basic networking concepts"
  *               attachmentPath:
- *                 type: string
- *                 format: uri
- *                 example: "https://example.com/lab.pdf"
+ *                 type: object
+ *                 properties:
+ *                   url:
+ *                     type: string
+ *                     format: uri
+ *                     example: "https://example.com/lab.pdf"
+ *                   type:
+ *                     type: string
+ *                     enum: [pdf, image, video]
+ *                     example: pdf
  *     responses:
  *       201:
  *         description: Lab created successfully
  */
+
 const createLab = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const result = await labsService.createLab(req)
@@ -107,7 +115,16 @@ const createLab = async (req: Request, res: Response, next: NextFunction) => {
  *               description:
  *                 type: string
  *               attachmentPath:
- *                 type: string
+ *                 type: object
+ *                 properties:
+ *                   url:
+ *                     type: string
+ *                     format: uri
+ *                     example: "https://example.com/lab.pdf"
+ *                   type:
+ *                     type: string
+ *                     enum: [pdf, image, video]
+ *                     example: pdf
  *     responses:
  *       200:
  *         description: Lab updated successfully
@@ -148,9 +165,9 @@ const deleteLab = async (req: Request, res: Response, next: NextFunction) => {
 
 /**
  * @swagger
- * /api/admin/labs/{id}/status:
+ * /api/admin/labs/publish/{id}:
  *   patch:
- *     summary: Update lab status
+ *     summary: Update lab status to published
  *     tags: [Admin - Labs]
  *     parameters:
  *       - in: path
@@ -158,23 +175,38 @@ const deleteLab = async (req: Request, res: Response, next: NextFunction) => {
  *         required: true
  *         schema:
  *           type: integer
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               status:
- *                 type: string
- *                 enum: [published, unpublished]
  *     responses:
  *       200:
  *         description: Status updated successfully
  */
-const updateLabStatus = async (req: Request, res: Response, next: NextFunction) => {
+const publishLab = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const lab = await labsService.updateLabStatus(+req.params.id, req.body.status, req.user!.email)
+    const lab = await labsService.publishLab(+req.params.id, req.user!.email)
+    res.status(200).json({ success: true, data: lab, message: 'Lab status updated successfully' })
+  } catch (error) {
+    next(error)
+  }
+}
+
+/**
+ * @swagger
+ * /api/admin/labs/unpublish/{id}:
+ *   patch:
+ *     summary: Update lab status to unpublished
+ *     tags: [Admin - Labs]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Status updated successfully
+ */
+const unpublishLab = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const lab = await labsService.unpublishLab(+req.params.id, req.user!.email)
     res.status(200).json({ success: true, data: lab, message: 'Lab status updated successfully' })
   } catch (error) {
     next(error)
@@ -187,5 +219,6 @@ export const labsController = {
   getLabsById,
   updateLab,
   deleteLab,
-  updateLabStatus
+  publishLab,
+  unpublishLab
 }
