@@ -28,10 +28,10 @@ export class Admin {
   @Column({ type: 'varchar', length: 150,  nullable: true })
   password?: string
 
-  @Column({ type: 'varchar', length: 20, default: AdminStatusEnum.PENDING })
+  @Column({ name: 'status', type: 'enum', enum: AdminStatusEnum, default: AdminStatusEnum.PENDING })
   status!: AdminStatusEnum
 
-  @Column({ type: 'varchar', length: 20, default: AdminRoleEnum.EDITOR })
+  @Column({ name: 'role', type: 'enum', enum: AdminRoleEnum, default: AdminRoleEnum.EDITOR })
   role!: AdminRoleEnum
 
   @Column({ name: 'invite_token', type: 'varchar', length: 255, nullable: true })
