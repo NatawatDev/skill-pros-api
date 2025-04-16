@@ -4,6 +4,7 @@ import { AppDataSource } from '@/config/data-source'
 import * as argon from 'argon2'
 import { NotFoundException, ConflictException, UnauthorizedException } from '@/common/exceptions'
 import { signAccessToken, signRefreshToken, verifyRefreshToken } from '@/common/utils/jwt.util'
+import { AdminStatusEnum } from '@/common/enum/admin.enum'
 
 const adminRepository = AppDataSource.getRepository(Admin)
 
@@ -16,7 +17,12 @@ const loginAdmin = async (req: Request) => {
     throw new NotFoundException('This email was not found.')
   }
 
+  if (!admin.password || admin.status === AdminStatusEnum.PENDING) {
+    throw new UnauthorizedException('Account not yet activated. Please check your invite email.')
+  }
+
   const passwordValid = await argon.verify(admin.password, password)
+
   if (!admin.password || !passwordValid) {
     throw new ConflictException('The password is incorrect. Please try again.')
   }
@@ -76,7 +82,7 @@ const refreshAccessToken = async (refreshToken: string) => {
   const newRefreshToken = signRefreshToken({ userId: admin.id })
 
   admin.refreshToken = await argon.hash(newRefreshToken)
-  
+
   await adminRepository.save(admin)
 
   return {

@@ -6,6 +6,7 @@ import dotenv from 'dotenv'
 import swaggerUi from 'swagger-ui-express'
 import { createSwaggerSpec } from '@/config/swagger'
 import adminAuthRoutes from '@/modules/admin/auth/auth.routes'
+import adminAdminRoutes from '@/modules/admin/admins/admins.routes'
 // import errorHandler from '@/common/middlewares/error-handler'
 
 dotenv.config()
@@ -24,6 +25,7 @@ app.use(cookieParser())
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(createSwaggerSpec()))
 
 app.use('/api/admin/auth', adminAuthRoutes)
+app.use('/api/admin/admins', adminAdminRoutes)
 
 // global error handler
 app.use((err:any, req: Request, res: Response, next: NextFunction) => {

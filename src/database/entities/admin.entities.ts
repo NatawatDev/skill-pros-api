@@ -25,8 +25,8 @@ export class Admin {
   @Column({ type: 'varchar', length: 20 })
   phone!: string
 
-  @Column({ type: 'varchar', length: 150 })
-  password!: string
+  @Column({ type: 'varchar', length: 150,  nullable: true })
+  password?: string
 
   @Column({ type: 'varchar', length: 20, default: AdminStatusEnum.PENDING })
   status!: AdminStatusEnum
@@ -35,7 +35,7 @@ export class Admin {
   role!: AdminRoleEnum
 
   @Column({ name: 'invite_token', type: 'varchar', length: 255, nullable: true })
-  inviteToken?: string
+  inviteToken?: string | null
 
   @Column({ name: 'reset_password_token', type: 'varchar', length: 255, nullable: true })
   resetPasswordToken?: string
