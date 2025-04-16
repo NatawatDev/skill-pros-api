@@ -3,11 +3,16 @@ import { Admin } from '@/database/entities/admin.entities'
 import { AppDataSource } from '@/config/data-source'
 import * as argon from 'argon2'
 import dayjs from 'dayjs'
-import { ConflictException, UnauthorizedException } from '@/common/exceptions'
-import { generateInviteToken } from '@/common/utils/token.util'
+import { ConflictException, UnauthorizedException, NotFoundException, BadRequestException } from '@/common/exceptions'
+import { generateToken } from '@/common/utils/token.util'
 import { AdminRoleEnum, AdminStatusEnum } from '@/common/enum/admin.enum'
 import { JwtPayload } from 'jsonwebtoken'
-import { sendInviteEmail } from '@/services/email/email.services' 
+import { sendInviteEmail, sendResetPasswordEmail } from '@/services/email/email.services'
+import configuration from '@/config/configuraton'
+import { IsNull, Not } from 'typeorm'
+import { TokenTypeEnum } from '@/common/enum/token.enum'
+
+const config = configuration()
 
 const adminRepository = AppDataSource.getRepository(Admin)
 
@@ -19,7 +24,7 @@ const inviteAdmin = async (req: Request, inviter: JwtPayload) => {
   
   if (existing) throw new ConflictException('This email has already been invited.')
 
-  const rawToken = generateInviteToken()
+  const rawToken = generateToken()
   const hashedToken = await argon.hash(rawToken)
 
   const newAdmin = adminRepository.create({
@@ -33,67 +38,107 @@ const inviteAdmin = async (req: Request, inviter: JwtPayload) => {
 
   await adminRepository.save(newAdmin)
   
-  const inviteLink = `${process.env.FRONTEND_URL}/setup-password?token=${rawToken}`
   await sendInviteEmail({
     to: email,
     name: `${firstname} ${lastname}`,
-    inviteLink,
+    inviteLink: `${config.frontend.url}/setup-password?token=${rawToken}`,
   })
 
   return { email }
 }
 
-const verifyInviteToken = async (req: Request) => {
-
-  const { token } = req.body 
+export const validateToken = async (token: string, type: TokenTypeEnum): Promise<Admin> => {
 
   const admins = await adminRepository.find({
-    where: { status: AdminStatusEnum.PENDING },
+    where: type === TokenTypeEnum.INVITE
+      ? { status: AdminStatusEnum.PENDING, inviteToken: Not(IsNull()) }
+      : { resetPasswordToken: Not(IsNull()) },
   })
 
   for (const admin of admins) {
-    if (admin.inviteToken && await argon.verify(admin.inviteToken, token)) {
-      const expired = dayjs().diff(admin.invitedAt, 'hour') > 24
-      if (expired) throw new UnauthorizedException('Invite token expired')
-      return { email: admin.email }
+    const hash = type === TokenTypeEnum.INVITE ? admin.inviteToken : admin.resetPasswordToken
+    const timestamp = type === TokenTypeEnum.INVITE ? admin.invitedAt : admin.updatedAt
+
+    if (hash && await argon.verify(hash, token)) {
+      const isExpired = timestamp && dayjs().diff(timestamp, 'hour') > 24
+      if (isExpired) throw new UnauthorizedException(`${type} token expired.`)
+      return admin
     }
   }
 
-  throw new UnauthorizedException('Invalid invite token')
+  throw new UnauthorizedException(`Invalid ${type} token`)
 }
 
 const setupAccount = async (req: Request) => {
-
   const { inviteToken, password, confirmPassword } = req.body
 
   if (password !== confirmPassword) {
-    throw new ConflictException('Your Password and Confirm password does not match.')
+    throw new ConflictException('Password and Confirm Password does not match.')
   }
 
-  const admins = await adminRepository.find({
-    where: { status: AdminStatusEnum.PENDING },
+  const admin = await validateToken(inviteToken, TokenTypeEnum.INVITE)
+
+  if (!admin) {
+    throw new NotFoundException('Admin Not Found.')
+  }
+
+  admin.password = await argon.hash(password)
+  admin.inviteToken = null
+  admin.status = AdminStatusEnum.ACTIVE
+
+  await adminRepository.save(admin)
+}
+
+const sendResetPassword = async (req: Request) => {
+
+  const { email } = req.body
+
+  const admin = await adminRepository.findOneBy({ email })
+
+  if (!admin) { 
+    throw new NotFoundException('Email not found.')
+  }
+
+  if (admin.role === AdminRoleEnum.SUPERADMIN) {
+    throw new BadRequestException('This account is not allowed to reset password via email.')
+  }
+
+  const rawToken = generateToken()
+  const hashedToken = await argon.hash(rawToken)
+
+  admin.resetPasswordToken = hashedToken
+  await adminRepository.save(admin)
+
+  await sendResetPasswordEmail({
+    to: admin.email,
+    name: admin.firstname,
+    resetLink: `${config.frontend.url}/reset-password?token=${rawToken}`
   })
+}
 
-  for (const admin of admins) {
-    if (admin.inviteToken && await argon.verify(admin.inviteToken, inviteToken)) {
-      if (dayjs().diff(admin.invitedAt, 'hour') > 24) {
-        throw new UnauthorizedException('Invite token expired')
-      }
+const resetPassword = async (req: Request) => {
+  const { resetPasswordToken, password, confirmPassword } = req.body
 
-      admin.password = await argon.hash(password)
-      admin.status = AdminStatusEnum.ACTIVE
-      admin.inviteToken = null
-      await adminRepository.save(admin)
-      return { email: admin.email }
-    }
+  if (password !== confirmPassword) {
+    throw new ConflictException('Password and Confirm Password does not match.')
   }
 
-  throw new UnauthorizedException('Invalid invite token')
+  const admin = await validateToken(resetPasswordToken, TokenTypeEnum.RESET)
+
+  if (!admin) {
+    throw new NotFoundException('Admin Not Found.')
+  }
+
+  admin.password = await argon.hash(password)
+  admin.resetPasswordToken = null
+  await adminRepository.save(admin)
 }
 
 
 export const adminsService = {
   inviteAdmin,
   setupAccount,
-  verifyInviteToken
+  validateToken,
+  sendResetPassword,
+  resetPassword
 }

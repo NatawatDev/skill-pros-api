@@ -38,7 +38,7 @@ export class Admin {
   inviteToken?: string | null
 
   @Column({ name: 'reset_password_token', type: 'varchar', length: 255, nullable: true })
-  resetPasswordToken?: string
+  resetPasswordToken?: string | null
 
   @Column({ name: 'refresh_token', type: 'varchar', length: 255, nullable: true })
   refreshToken?: string | null

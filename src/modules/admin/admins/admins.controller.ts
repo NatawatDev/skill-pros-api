@@ -80,9 +80,61 @@ const setupAccount = async (req: Request, res: Response, next: NextFunction) => 
 
 /**
  * @swagger
- * /api/admin/admins/verify-invite-token:
+ * /api/admin/admins/verify-token:
  *   post:
- *     summary: Verify Invite Token
+ *     summary: Verify Token (Invite / Reset)
+ *     tags: [Admin]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - token
+ *               - type
+ *             properties:
+ *               token:
+ *                 type: string
+ *               type:
+ *                 type: string
+ *                 enum: [invite, reset]
+ *                 description: Type of token (invite or reset)
+ *     responses:
+ *       200:
+ *         description: Verify token successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     email:
+ *                       type: string
+ *       401:
+ *         description: Invalid or expired token
+ */
+const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { token, type } = req.body
+    const result = await adminsService.validateToken(token, type)
+    res.status(200).json({ success: true, message: 'Verify token successfully', data: result })
+  } catch (error) {
+    next(error)
+  }
+}
+
+/**
+ * @swagger
+ * /api/admin/admins/forget-password:
+ *   post:
+ *     summary: forget password
  *     tags: [Admin]
  *     requestBody:
  *       required: true
@@ -91,25 +143,63 @@ const setupAccount = async (req: Request, res: Response, next: NextFunction) => 
  *           schema:
  *             type: object
  *             properties:
- *               inviteToken:
+ *               email:
  *                 type: string
  *     responses:
  *       200:
- *         description: Validate invite token successfully
+ *         description: Send forget password email successfully
  *       401:
  *         description: Invalid or expired token
  */
-const verifyInviteToken = async (req: Request, res: Response, next: NextFunction) => {
+const forgetPassword = async (req: Request, res: Response, next: NextFunction) =>  {
   try {
-    const result = await adminsService.verifyInviteToken(req)
-    res.status(200).json({ success: true, message: 'Validate invite token successfully', data: result })
+    await adminsService.sendResetPassword(req)
+    res.status(200).json({ success: true, message: 'Reset link sent to your email' })
   } catch (error) {
     next(error)
   }
 }
 
+
+/**
+ * @swagger
+ * /api/admin/admins/reset-password:
+ *   post:
+ *     summary: Reset password for admin
+ *     tags: [Admin]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               resetPasswordToken:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               confirmPassword:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Password reset successful
+ *       401:
+ *         description: Invalid or expired token
+ */
+const resetPassword = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    await adminsService.resetPassword(req)
+    res.status(200).json({ success: true, message: 'Password reset successful' })
+  } catch (error) {
+    next(error)
+  }
+}
+
+
 export const adminsController = {
   inviteAdmin,
   setupAccount,
-  verifyInviteToken
+  verifyToken,
+  forgetPassword,
+  resetPassword
 }
