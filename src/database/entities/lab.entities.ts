@@ -1,3 +1,4 @@
+import { LabStatusEnum } from '@/common/enum/lab.enum'
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -31,5 +32,13 @@ export class Lab {
 
   @UpdateDateColumn({ name: 'updated_at', type: 'timestamp', nullable: true })
   updatedAt?: Date
+
+  @Column({
+    name: 'status',
+    type: 'enum',
+    enum: LabStatusEnum,
+    default: LabStatusEnum.PUBLISHED,
+  })
+  status!: LabStatusEnum  
 }
 
