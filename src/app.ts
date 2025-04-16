@@ -7,6 +7,8 @@ import swaggerUi from 'swagger-ui-express'
 import { createSwaggerSpec } from '@/config/swagger'
 import adminAuthRoutes from '@/modules/admin/auth/auth.routes'
 import adminAdminRoutes from '@/modules/admin/admins/admins.routes'
+import coreUploadRoutes from '@/modules/core/upload/upload.routes'
+
 // import errorHandler from '@/common/middlewares/error-handler'
 
 dotenv.config()
@@ -23,6 +25,8 @@ app.use(cookieParser())
 
 // router
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(createSwaggerSpec()))
+
+app.use('/upload', coreUploadRoutes)
 
 app.use('/api/admin/auth', adminAuthRoutes)
 app.use('/api/admin/admins', adminAdminRoutes)
