@@ -2,8 +2,8 @@ import { Request } from 'express'
 import { AppDataSource } from '@/config/data-source'
 import { Lab } from '@/database/entities/lab.entities'
 import { LabStatusEnum } from '@/common/enum/lab.enum'
-import { NotFoundException } from '@/common/exceptions'
-import { IUpdateLab } from './labs.interfaces'
+import { BadRequestException, NotFoundException } from '@/common/exceptions'
+import { IUpdateLab } from './labs.validator'
 
 const labRepository = AppDataSource.getRepository(Lab)
 
@@ -65,16 +65,38 @@ const deleteLab = async (id: number) => {
   await labRepository.delete(id)
 }
 
-const updateLabStatus = async (id: number, status: LabStatusEnum, updatedBy: string) => {
+const publishLab = async (id: number, updatedBy: string) => {
   const lab = await labRepository.findOneBy({ id })
 
   if (!lab) { 
     throw new NotFoundException('Lab not found')
   }
 
+  if (lab.status !== LabStatusEnum.UNPUBLISHED) {
+    throw new BadRequestException('Lab status is not unpublished')
+  }
+
   return await labRepository.save({
     ...lab,
-    status,
+    status: LabStatusEnum.PUBLISHED,
+    updatedBy
+  })
+}
+
+const unpublishLab = async (id: number, updatedBy: string) => {
+  const lab = await labRepository.findOneBy({ id })
+
+  if (!lab) { 
+    throw new NotFoundException('Lab not found')
+  }
+
+  if (lab.status !== LabStatusEnum.PUBLISHED) {
+    throw new BadRequestException('Lab status is not published')
+  }
+
+  return await labRepository.save({
+    ...lab,
+    status: LabStatusEnum.UNPUBLISHED,
     updatedBy
   })
 }
@@ -86,5 +108,6 @@ export const labsService = {
   getLabsById,
   updateLab,
   deleteLab,
-  updateLabStatus
+  publishLab,
+  unpublishLab
 }
