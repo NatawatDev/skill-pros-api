@@ -41,7 +41,7 @@ export class Admin {
   resetPasswordToken?: string
 
   @Column({ name: 'refresh_token', type: 'varchar', length: 255, nullable: true })
-  refreshToken?: string
+  refreshToken?: string | null
 
   @Column({ name: 'invited_at', type: 'timestamp', nullable: true })
   invitedAt?: Date

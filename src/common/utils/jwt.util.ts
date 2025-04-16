@@ -1,5 +1,6 @@
 import jwt, { SignOptions }  from 'jsonwebtoken'
 import configuration from '@/config/configuraton'
+import { JwtPayload } from '@/common/interfaces/jwt-payload.interface'
 
 const config = configuration()
 
@@ -19,9 +20,9 @@ export const signRefreshToken = (payload: object, expiresIn = '7d'): string => {
 }
 
 export const verifyAccessToken = (token: string): any => {
-  return jwt.verify(token, accessSecret)
+  return jwt.verify(token, accessSecret) as JwtPayload
 }
 
 export const verifyRefreshToken = (token: string): any => {
-  return jwt.verify(token, refreshSecret)
+  return jwt.verify(token, refreshSecret) as JwtPayload
 }
