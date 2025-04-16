@@ -1,9 +1,9 @@
 import app from './app'
-import { PostgresDataSource } from './config/data-source'
+import { AppDataSource } from './config/data-source'
 
 const PORT = process.env.PORT || 3000
 
-PostgresDataSource.initialize()
+AppDataSource.initialize()
   .then(() => {
     console.log('✅ Data Source has been initialized.')
     app.listen(PORT, () => {
