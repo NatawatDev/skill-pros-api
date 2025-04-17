@@ -42,7 +42,7 @@ const getQuestionsByLab = async (labId: number) => {
 
 const updateQuestions = async (labId: number, payload: IQuestion[], userEmail: string) => {
 
-  const lab = await labRepository.findOne({ where: { id: labId } })
+    const lab = await labRepository.findOne({ where: { id: labId } })
   
   if (!lab) { 
     throw new NotFoundException('Lesson not found.')
@@ -54,7 +54,7 @@ const updateQuestions = async (labId: number, payload: IQuestion[], userEmail: s
     throw new ConflictException('You can only have 10 questions per lab.')
   }
   
-  const saveQuestion = payload.map((item, index) => {
+  const updateQuestion = payload.map((item, index) => {
     return questionRepository.create({
       ...item,
       ...question,
@@ -64,7 +64,7 @@ const updateQuestions = async (labId: number, payload: IQuestion[], userEmail: s
     })
   })
 
-  return await questionRepository.save(saveQuestion)
+  return await questionRepository.save(updateQuestion)
 }
 
 const deleteQuestion = async (id: number) => {

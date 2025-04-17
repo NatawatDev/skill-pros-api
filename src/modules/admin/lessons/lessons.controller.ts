@@ -61,23 +61,42 @@ const getLessonById = async (req: Request, res: Response, next: NextFunction) =>
  * @swagger
  * /api/admin/labs/{labId}/lessons:
  *   post:
- *     summary: Create lesson under a lab
+ *     summary: Create Lessons for a lab
  *     tags: [Admin - Lessons]
  *     parameters:
  *       - in: path
  *         name: labId
+ *         required: true
  *         schema:
  *           type: integer
- *         required: true
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/CreateLesson'
+ *             type: array
+ *             items:
+ *               type: object
+ *               required: [title]
+ *               properties:
+ *                 title:
+ *                   type: string
+ *                 content:
+ *                   type: string
+ *                 attachmentPath:
+ *                   type: object
+ *                   properties:
+ *                     url:
+ *                       type: string
+ *                       format: uri
+ *                     type:
+ *                       type: string
+ *                       enum: [pdf, image, video]
+ *                 order:
+ *                   type: number
  *     responses:
  *       201:
- *         description: Lesson created
+ *         description: Lessons created successfully.
  */
 const createLesson = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -88,14 +107,52 @@ const createLesson = async (req: Request, res: Response, next: NextFunction) => 
   }
 }
 
+/**
+ * @swagger
+ * /api/admin/labs/{labId}/lessons:
+ *   put:
+ *     summary: Update Lessons for a lab (replace all)
+ *     tags: [Admin - Lessons]
+ *     parameters:
+ *       - in: path
+ *         name: labId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: array
+ *             items:
+ *               type: object
+ *               required: [id, title]
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                 title:
+ *                   type: string
+ *                 content:
+ *                   type: string
+ *                 attachmentPath:
+ *                   type: object
+ *                   properties:
+ *                     url:
+ *                       type: string
+ *                       format: uri
+ *                     type:
+ *                       type: string
+ *                       enum: [pdf, image, video]
+ *                 order:
+ *                   type: number
+ *     responses:
+ *       200:
+ *         description: Lessons updated successfully.
+ */
 const updateLesson = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const lesson = await lessonsService.updateLesson(
-      +req.params.labId,
-      +req.params.id,
-      req.body,
-      req.user!.email
-    )
+    const lesson = await lessonsService.updateLesson(+req.params.labId, req.body, req.user!.email)
     res.status(200).json({ success: true, data: lesson, message: 'Lesson updated successfully' })
   } catch (error) {
     next(error)
@@ -108,10 +165,33 @@ const updateLesson = async (req: Request, res: Response, next: NextFunction) => 
  *   delete:
  *     summary: Delete a lesson
  *     tags: [Admin - Lessons]
+ *     parameters:
+ *       - in: path
+ *         name: labId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Lesson deleted successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
  */
 const deleteLesson = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    await lessonsService.deleteLesson(+req.params.labId, +req.params.id)
+    await lessonsService.deleteLesson(+req.params.id)
     res.status(200).json({ success: true, message: 'Lesson deleted successfully' })
   } catch (error) {
     next(error)
