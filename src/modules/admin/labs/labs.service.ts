@@ -3,7 +3,8 @@ import { AppDataSource } from '@/config/data-source'
 import { Lab } from '@/database/entities/lab.entities'
 import { LabStatusEnum } from '@/common/enum/lab.enum'
 import { BadRequestException, NotFoundException } from '@/common/exceptions'
-import { IUpdateLab } from './labs.validator'
+import { IQueryLabs, IUpdateLab } from './labs.validator'
+import { paginate } from '@/services/pagination/pagination.services'
 
 const labRepository = AppDataSource.getRepository(Lab)
 
@@ -22,9 +23,27 @@ const createLab = async (req: Request) => {
   return await labRepository.save(newLab)
 }
 
-const getAllLabs = async () => {
-  const lab = await labRepository.find({ where: { status: LabStatusEnum.PUBLISHED } })
-  return lab
+const getAllLabs = async (options: IQueryLabs) => {
+    const { searchText, page, limitPerPage, all } = options
+  
+    const query = labRepository
+      .createQueryBuilder('lab')
+      .where('lab.status = :status',
+        { status: LabStatusEnum.PUBLISHED })
+      .orderBy('lab.createdAt', 'DESC')
+  
+    if (searchText) {
+      query.andWhere(
+        `(lab.name ILIKE :search)`,
+        { search: `%${searchText}%` }
+      )
+    }
+  
+    return await paginate(query, { 
+      page, 
+      limitPerPage, 
+      all 
+    })
 }
 
 const getLabsById = async (id: number) => {

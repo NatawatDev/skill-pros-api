@@ -1,10 +1,13 @@
 import { Request, Response, NextFunction } from 'express'
 import { labsService } from './labs.service'
+import { querySchema } from './labs.validator'
 
-const getAllLabs = async (_req: Request, res: Response, next: NextFunction) => {
+const getAllLabs = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const result = await labsService.getAllLabs()
-    res.status(200).json({ success: true, data: result })
+
+    const query = querySchema.parse(req.query)
+    const result = await labsService.getAllLabs(query)
+    res.status(200).json({ success: true, ...result })
   } catch (error) {
     next(error)
   }

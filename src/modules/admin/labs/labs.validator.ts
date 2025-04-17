@@ -20,5 +20,14 @@ export const updateLabSchema = z.object({
   status: z.nativeEnum(LabStatusEnum).optional(),
 })
 
+export const querySchema = z.object({
+  page: z.coerce.number().min(1).default(1),
+  limitPerPage: z.coerce.number().min(1).default(10),
+  all: z.coerce.boolean().optional(),
+  searchText: z.string().optional(),
+})
+
+export type IQueryLabs = z.infer<typeof querySchema>
+
 export type ICreateLab = z.infer<typeof createLabSchema>
 export type IUpdateLab = z.infer<typeof updateLabSchema>

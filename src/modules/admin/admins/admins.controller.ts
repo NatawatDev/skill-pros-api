@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 import { adminsService } from './admins.service'
-import { IQueryAdmins, querySchema } from './admins.validator'
+import { querySchema } from './admins.validator'
 
 
 const inviteAdmin = async (req: Request, res: Response, next: NextFunction) => {
@@ -60,7 +60,7 @@ const findAllAdmins = async (req: Request, res: Response, next: NextFunction) =>
     const query = querySchema.parse(req.query)
     const result = await adminsService.findAllAdmins(query)
     
-    res.status(200).json({ success: true, result })
+    res.status(200).json({ success: true, ...result })
   } catch (error) {
     next(error)
   }
