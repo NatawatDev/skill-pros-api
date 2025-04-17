@@ -11,7 +11,7 @@ export const validateBody = (schema: ZodSchema) => {
         res.status(400).json({
           success: false,
           message: 'Validation error',
-          error: error,
+          error: error.issues.map((item) => item.message),
         })
       }
       next(error)
@@ -29,7 +29,7 @@ export const validateQuery = (schema: ZodSchema) => {
         res.status(400).json({
           success: false,
           message: 'Validation error',
-          error: error,
+          error: error.issues.map((item) => item.message),
         })
       }
       next(error)
@@ -47,7 +47,7 @@ export const validateParams = (schema: ZodSchema) => {
         res.status(400).json({
           success: false,
           message: 'Validation error',
-          error: error,
+          error: error.issues.map((item) => item.message),
         })
       }
       next(error)

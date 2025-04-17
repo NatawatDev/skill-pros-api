@@ -1,37 +1,30 @@
-import Joi from 'joi'
+import { z } from 'zod'
 import { MediaTypeEnum } from '@/common/enum/media.enum'
 import { LabStatusEnum } from '@/common/enum/lab.enum'
 
-export interface ILesson {
-  title: string
-  content?: string
-  attachmentPath?: { url: string, type: MediaTypeEnum }
-  order?: number
-  status?: LabStatusEnum
-}
-
-const attachmentPathSchema = Joi.object({
-  url: Joi.string().required(),
-  type: Joi.string().valid(...Object.values(MediaTypeEnum)).required()
+const attachmentPathSchema = z.object({
+  url: z.string().url({ message: 'Invalid URL format' }),
+  type: z.nativeEnum(MediaTypeEnum),
 })
 
-const createLessonSchema = Joi.object({
-  title: Joi.string().required(),
-  content: Joi.string().optional(),
+export const createLessonSchema = z.object({
+  title: z.string(),
+  content: z.string().optional(),
   attachmentPath: attachmentPathSchema.optional(),
-  order: Joi.number().default(0),
-  status: Joi.string().valid(...Object.values(LabStatusEnum)).optional(),
+  order: z.number().default(0),
+  status: z.nativeEnum(LabStatusEnum).optional(),
 })
 
-export const createLessonListSchema = Joi.array()
-  .items(createLessonSchema)
-  .min(1)
-  .required()
+export const createLessonListSchema = z.array(createLessonSchema).min(1)
 
-export const updateLessonSchema = Joi.object({
-  title: Joi.string().optional(),
-  content: Joi.string().optional(),
+export const updateLessonSchema = z.object({
+  title: z.string().optional(),
+  content: z.string().optional(),
   attachmentPath: attachmentPathSchema.optional(),
-  order: Joi.number().default(0),
-  status: Joi.string().valid(...Object.values(LabStatusEnum)).optional(),
+  order: z.number().optional(),
+  status: z.nativeEnum(LabStatusEnum).optional(),
 })
+
+
+export type ILesson = z.infer<typeof createLessonSchema>
+export type ILessonList = z.infer<typeof createLessonListSchema>

@@ -1,10 +1,10 @@
 import { Router } from 'express'
 import { lessonsController } from './lessons.controller'
 import { authGuard } from '@/common/guard/auth.guard'
-import { validateBody } from '@/common/middlewares/validate'
+import { validateBody } from '@/common/middlewares/validateRequest'
 import { createLessonListSchema, updateLessonSchema } from './lessons.validator'
 
-const router = Router({ mergeParams: true })
+const router = Router()
 
 router.use(authGuard)
 

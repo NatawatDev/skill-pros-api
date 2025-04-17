@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { authController } from './auth.controller'
-import { validateBody } from '@/common/middlewares/validate'
+import { validateBody } from '@/common/middlewares/validateRequest'
 import { loginAdminSchema } from './auth.validator' 
 import { authGuard } from '@/common/guard/auth.guard'
 

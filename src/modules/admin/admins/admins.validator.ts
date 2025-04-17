@@ -1,47 +1,34 @@
 import { TokenTypeEnum } from '@/common/enum/token.enum'
-import { IPaginate } from '@/services/pagination/pagination.interface'
-import Joi from 'joi'
 import { z } from 'zod'
 
-export const inviteAdminSchema = Joi.object({
-  firstname: Joi.string().max(100).required(),
-  lastname: Joi.string().max(100).required(),
-  email: Joi.string().email().required(),
-  phone: Joi.string().required()
+export const inviteAdminSchema = z.object({
+  firstname: z.string().max(100),
+  lastname: z.string().max(100),
+  email: z.string().email(),
+  phone: z.string()
 })
 
-export const setupPasswordAdminSchema = Joi.object({
-  inviteToken: Joi.string().max(100).required(),
-  password: Joi.string().min(6).required(),
-  confirmPassword: Joi.string().min(6).required()
-}) 
-
-
-export const verifyTokenSchema = Joi.object({
-  token: Joi.string().max(100).required(),
-  type: Joi.string().valid(...Object.values(TokenTypeEnum)).required(),
-}) 
-
-export const forgetPasswordSchema = Joi.object({
-  email: Joi.string().email().required()
-}) 
-
-export const resetPasswordSchema = Joi.object({
-  resetPasswordToken: Joi.string().max(100).required(),
-  password: Joi.string().min(6).required(),
-  confirmPassword: Joi.string().min(6).required(),
+export const setupPasswordAdminSchema = z.object({
+  inviteToken: z.string().max(100),
+  password: z.string().min(6),
+  confirmPassword: z.string().min(6),
 })
 
-// export interface IQueryAdmins extends IPaginate {
-//   searchText?: string
-// }
+export const verifyTokenSchema = z.object({
+  token: z.string().max(100),
+  type: z.enum([TokenTypeEnum.INVITE, TokenTypeEnum.RESET]),
+})
 
-// export const querySchema = Joi.object({
-//   searchText: Joi.string().optional(),
-//   page: Joi.number().required().min(1),
-//   limitPerPage: Joi.number().required().min(1),
-//   all: Joi.boolean().optional()
-// })
+export const forgetPasswordSchema = z.object({
+  email: z.string().email(),
+})
+
+export const resetPasswordSchema = z.object({
+  resetPasswordToken: z.string().max(100),
+  password: z.string().min(6),
+  confirmPassword: z.string().min(6),
+})
+
 
 export const querySchema = z.object({
   page: z.coerce.number().min(1).default(1),

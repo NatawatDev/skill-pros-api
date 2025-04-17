@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { authGuard } from '@/common/guard/auth.guard'
-import { validateBody } from '@/common/middlewares/validate'
+import { validateBody } from '@/common/middlewares/validateRequest'
 import { questionsController } from './questions.controller'
 import { questionListSchema } from './questions.validator'
 

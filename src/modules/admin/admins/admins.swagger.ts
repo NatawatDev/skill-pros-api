@@ -179,7 +179,7 @@
  *           type: boolean
  *         description: If true, return all items without pagination
  *       - in: query
- *         name: search
+ *         name: searchText
  *         schema:
  *           type: string
  *         description: Search by first name, last name or email  
