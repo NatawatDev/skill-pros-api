@@ -151,3 +151,39 @@
  *       401:
  *         description: Invalid or expired token
  */
+
+
+//find all admins
+/**
+ * @swagger
+ * /api/admin/admins:
+ *   get:
+ *     summary: Get all admins with optional search and pagination
+ *     tags: [Admin]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         description: Page number 
+ *         default: 1
+ *       - in: query
+ *         name: limitPerPage
+ *         schema:
+ *           type: integer
+ *         description: Items per page 
+ *         default: 10
+ *       - in: query
+ *         name: all
+ *         schema:
+ *           type: boolean
+ *         description: If true, return all items without pagination
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: Search by first name, last name or email  
+ *     responses:
+ *       200:
+ *         description: List of admins
+ */

@@ -9,11 +9,14 @@ import {
   setupPasswordAdminSchema, 
   verifyTokenSchema, 
   forgetPasswordSchema, 
-  resetPasswordSchema 
+  resetPasswordSchema, 
+  querySchema
 } from './admins.validator'
+import { validateQuery } from '@/common/middlewares/validateRequest'
 
 const router = Router()
 
+router.get('/', authGuard,  validateQuery(querySchema), adminsController.findAllAdmins)
 router.post('/invite', authGuard, permissionGuard(AdminRoleEnum.SUPERADMIN), validateBody(inviteAdminSchema), adminsController.inviteAdmin)
 router.post('/setup-password', validateBody(setupPasswordAdminSchema), adminsController.setupAccount)
 router.post('/verify-token', validateBody(verifyTokenSchema) , adminsController.verifyToken)
