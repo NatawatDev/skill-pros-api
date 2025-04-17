@@ -139,7 +139,7 @@ const resetPassword = async (req: Request) => {
 export const findAllAdmins = async (options: IQueryAdmins) => {
   const { searchText, page, limitPerPage, all } = options
 
-  const query = AppDataSource.getRepository(Admin)
+  const query = adminRepository
     .createQueryBuilder('admin')
     .orderBy('admin.createdAt', 'DESC')
 

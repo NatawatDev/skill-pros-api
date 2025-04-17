@@ -5,11 +5,34 @@
  * @swagger
  * /api/admin/labs:
  *   get:
- *     summary: Get all labs
+ *     summary: Get all labs with optional search and pagination
  *     tags: [Admin - Labs]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         description: Page number 
+ *         default: 1
+ *       - in: query
+ *         name: limitPerPage
+ *         schema:
+ *           type: integer
+ *         description: Items per page 
+ *         default: 10
+ *       - in: query
+ *         name: all
+ *         schema:
+ *           type: boolean
+ *         description: If true, return all items without pagination
+ *       - in: query
+ *         name: searchText
+ *         schema:
+ *           type: string
+ *         description: Search by lab name  
  *     responses:
  *       200:
- *         description: A list of labs
+ *         description: List of admins
  */
 
 
