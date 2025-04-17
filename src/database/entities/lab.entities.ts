@@ -9,6 +9,7 @@ import {
 } from 'typeorm'
 import { Lesson } from './lesson.entities'
 import { MediaTypeEnum } from '@/common/enum/media.enum'
+import { Question } from './question.entity'
 
 @Entity('labs')
 export class Lab {
@@ -49,5 +50,11 @@ export class Lab {
     onDelete: 'CASCADE',
   })
   lessons!: Lesson[]
+
+  @OneToMany(() => Question, (question) => question.lab, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  questions!: Question[]
 }
 
