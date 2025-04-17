@@ -19,7 +19,7 @@ export const swaggerOptions = {
     },
     security: [{ bearerAuth: [] }],
   },
-  apis: ['src/modules/**/*.ts'], 
+  apis: ['src/modules/**/*.ts'],
 }
 
 export const createSwaggerSpec = () => swaggerJSDoc(swaggerOptions)
