@@ -1,14 +1,14 @@
 import { AppDataSource } from '@/config/data-source'
 import { Lesson } from '@/database/entities/lesson.entities'
 import { Lab } from '@/database/entities/lab.entities'
-import { BadRequestException, NotFoundException } from '@/common/exceptions'
-import { ICreateLesson } from './lessons.validator'
+import { BadRequestException, ConflictException, NotFoundException } from '@/common/exceptions'
+import { ILesson } from './lessons.validator'
 import { LabStatusEnum } from '@/common/enum/lab.enum'
 
 const lessonRepository = AppDataSource.getRepository(Lesson)
 const labRepository = AppDataSource.getRepository(Lab)
 
-const createLesson = async (labId: number, lessonList: ICreateLesson[], createdBy: string) => {
+const createLesson = async (labId: number, lessonList: ILesson[], createdBy: string) => {
   const lab = await labRepository.findOneBy({ id: labId })
 
   if (!lab) {
@@ -47,62 +47,41 @@ const getLessonById = async (labId: number, lessonId: number) => {
   return lesson
 }
 
-const updateLesson = async (labId: number, lessonId: number, payload: ICreateLesson, updatedBy: string) => {
-  const lesson = await lessonRepository.findOne({
-    where: { id: lessonId, lab: { id: labId } },
-    relations: ['lab'],
-  })
-  if (!lesson) throw new NotFoundException('Lesson not found')
-
-  const originalOrder = lesson.order
-  const newOrder = payload.order
-
-  const updated = await lessonRepository.save({
-    ...lesson,
-    ...payload,
-    updatedBy,
-  })
-
-  if (newOrder !== undefined && newOrder !== originalOrder) {
-    const lessons = await lessonRepository.find({
-      where: { lab: { id: labId } },
-      order: { order: 'ASC' },
-    })
-
-    const ordered = lessons
-      .filter(l => l.id !== lessonId)
-      .sort((a, b) => a.order - b.order)
-
-    ordered.splice(newOrder, 0, updated)
-
-    for (let i = 0; i < ordered.length; i++) {
-      ordered[i].order = i
+const updateLesson = async (labId: number, payload: ILesson[], userEmail: string) => {
+    const lab = await labRepository.findOne({ where: { id: labId } })
+    
+    if (!lab) { 
+      throw new NotFoundException('Lesson not found.')
     }
-    await lessonRepository.save(ordered)
+  
+  
+  const lesson = await lessonRepository.find({ where: { lab: { id: labId } } })
+  
+  if (lesson.length + payload.length > 5) {
+    throw new ConflictException('You can only have 5 lessons per lab.')
   }
 
-  return updated
+  const updatedLesson = payload.map((item, index) => {
+    return lessonRepository.create({
+      ...item,
+      ...lesson,
+      order: index,
+      updatedBy: userEmail,
+      lab: { id: labId }
+    })
+  }) 
+  
+  return await lessonRepository.save(updatedLesson)
 }
 
-const deleteLesson = async (labId: number, lessonId: number): Promise<void> => {
-  const lesson = await lessonRepository.findOne({
-    where: { id: lessonId, lab: { id: labId } },
-    relations: ['lab'],
-  })
-  if (!lesson) throw new NotFoundException('Lesson not found')
-
-  await lessonRepository.remove(lesson)
-
-  const remaining = await lessonRepository.find({
-    where: { lab: { id: labId } },
-    order: { order: 'ASC' },
-  })
-
-  for (let i = 0; i < remaining.length; i++) {
-    remaining[i].order = i
-  }
-
-  await lessonRepository.save(remaining)
+const deleteLesson = async (id: number) => {
+    const existing = await labRepository.findOne({ where: { id } })
+  
+    if (!existing) { 
+      throw new NotFoundException('Lab not found')
+    }
+  
+    return await labRepository.remove(existing)
 }
 
 

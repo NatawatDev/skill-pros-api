@@ -2,10 +2,10 @@ import Joi from 'joi'
 import { MediaTypeEnum } from '@/common/enum/media.enum'
 import { LabStatusEnum } from '@/common/enum/lab.enum'
 
-export interface ICreateLesson {
+export interface ILesson {
   title: string
   content?: string
-  pathUrl?: { url: string, type: MediaTypeEnum }
+  attachmentPath?: { url: string, type: MediaTypeEnum }
   order?: number
   status?: LabStatusEnum
 }
