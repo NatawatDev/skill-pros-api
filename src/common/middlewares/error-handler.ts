@@ -1,15 +1,20 @@
 import { Request, Response, NextFunction } from 'express'
 import { HttpException } from '@/common/exceptions/http-exception'
 
-export default function errorHandler(err: any, req: Request, res: Response, next: NextFunction): Response {
-  const status = err.statusCode || 500
-  const message = status === 500 ? 'Internal server error' : err.message || 'Unexpected error'
+export default function errorHandler(err: Error, _req: Request, res: Response, _next: NextFunction) {
+  let status = 500
+  let message = 'Internal server error'
+
+  if (err instanceof HttpException) {
+    status = err.statusCode
+    message = err.message
+  }
 
   console.error('[Unhandled Error]', err)
 
-  return res.status(status).json({
+  res.status(status).json({
     success: false,
     message,
-    error: err || null,
+    error: err
   })
 }

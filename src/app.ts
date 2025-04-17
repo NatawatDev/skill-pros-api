@@ -1,4 +1,4 @@
-import express, { Request, Response, NextFunction } from 'express'
+import express, { Request, Response, NextFunction, ErrorRequestHandler } from 'express'
 import helmet from 'helmet'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
@@ -7,8 +7,9 @@ import swaggerUi from 'swagger-ui-express'
 import { createSwaggerSpec } from '@/config/swagger'
 import coreUploadRoutes from '@/modules/core/upload/upload.routes'
 import adminRouter from '@/modules/admin/admin.routes'
+import limiter from '@/common/middlewares/ratelimit'
 
-// import errorHandler from '@/common/middlewares/error-handler'
+import errorHandler from '@/common/middlewares/error-handler'
 
 dotenv.config()
 
@@ -19,6 +20,7 @@ app.use(helmet())
 app.use(cors())
 app.use(express.json())
 app.use(cookieParser())
+app.use(limiter)
 
 
 // router
@@ -29,8 +31,6 @@ app.use('/upload', coreUploadRoutes)
 app.use('/api/admin', adminRouter)
 
 // global error handler
-app.use((err:any, req: Request, res: Response, next: NextFunction) => {
-  res.status(err.statusCode || 500).json({ message: err.message })
-})
+app.use(errorHandler)
 
 export default app
