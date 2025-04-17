@@ -11,6 +11,8 @@ import { sendInviteEmail, sendResetPasswordEmail } from '@/services/email/email.
 import configuration from '@/config/configuraton'
 import { IsNull, Not } from 'typeorm'
 import { TokenTypeEnum } from '@/common/enum/token.enum'
+import { IQueryAdmins } from './admins.validator'
+import { paginate } from '@/services/pagination/pagination.services'
 
 const config = configuration()
 
@@ -134,11 +136,33 @@ const resetPassword = async (req: Request) => {
   await adminRepository.save(admin)
 }
 
+export const findAllAdmins = async (options: IQueryAdmins) => {
+  const { searchText, page, limitPerPage, all } = options
+
+  const query = AppDataSource.getRepository(Admin)
+    .createQueryBuilder('admin')
+    .orderBy('admin.createdAt', 'DESC')
+
+  if (searchText) {
+    query.andWhere(
+      `(admin.firstname ILIKE :search OR admin.lastname ILIKE :search OR admin.email ILIKE :search)`,
+      { search: `%${searchText}%` }
+    )
+  }
+
+  return await paginate(query, { 
+    page, 
+    limitPerPage, 
+    all 
+  })
+}
+
 
 export const adminsService = {
   inviteAdmin,
   setupAccount,
   validateToken,
   sendResetPassword,
-  resetPassword
+  resetPassword,
+  findAllAdmins
 }

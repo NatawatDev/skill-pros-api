@@ -1,5 +1,7 @@
 import { TokenTypeEnum } from '@/common/enum/token.enum'
+import { IPaginate } from '@/services/pagination/pagination.interface'
 import Joi from 'joi'
+import { z } from 'zod'
 
 export const inviteAdminSchema = Joi.object({
   firstname: Joi.string().max(100).required(),
@@ -29,3 +31,23 @@ export const resetPasswordSchema = Joi.object({
   password: Joi.string().min(6).required(),
   confirmPassword: Joi.string().min(6).required(),
 })
+
+// export interface IQueryAdmins extends IPaginate {
+//   searchText?: string
+// }
+
+// export const querySchema = Joi.object({
+//   searchText: Joi.string().optional(),
+//   page: Joi.number().required().min(1),
+//   limitPerPage: Joi.number().required().min(1),
+//   all: Joi.boolean().optional()
+// })
+
+export const querySchema = z.object({
+  page: z.coerce.number().min(1).default(1),
+  limitPerPage: z.coerce.number().min(1).default(10),
+  all: z.coerce.boolean().optional(),
+  searchText: z.string().optional(),
+})
+
+export type IQueryAdmins = z.infer<typeof querySchema>

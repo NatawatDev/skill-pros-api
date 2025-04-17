@@ -17,3 +17,20 @@ export const validateBody = (schema: Schema) => {
     next()
   }
 }
+
+export const validateQuery = (schema: Schema) => {
+  return (req: Request, _res: Response, next: NextFunction) => {
+    const { error, value } = schema.validate(req.query, {
+      abortEarly: false,
+      stripUnknown: true,
+      convert: true
+    })
+
+    if (error) {
+      throw new BadRequestException(error.details.map(d => d.message).join(', '))
+    }
+
+    req.query = value
+    next()
+  }
+}
