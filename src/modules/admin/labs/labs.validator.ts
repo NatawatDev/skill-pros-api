@@ -1,32 +1,24 @@
-import Joi from 'joi'
+import { z } from 'zod'
 import { LabStatusEnum } from '@/common/enum/lab.enum'
 import { MediaTypeEnum } from '@/common/enum/media.enum'
 
-export interface IUpdateLab {
-  name?: string
-  description?: string
-  attachmentPath?: IAttachmentPath
-  status?: LabStatusEnum
-}
-
-interface IAttachmentPath {
-  url: string,
-  type: MediaTypeEnum
-}
-
-const attachmentPathSchema = Joi.object({
-  url: Joi.string().required(),
-  type: Joi.string().valid(...Object.values(MediaTypeEnum))
+const attachmentPathSchema = z.object({
+  url: z.string().url({ message: 'Invalid URL format' }),
+  type: z.nativeEnum(MediaTypeEnum),
 })
 
-export const createLabSchema = Joi.object({
-  name: Joi.string().max(255).required(),
-  description: Joi.string().optional(),
+export const createLabSchema = z.object({
+  name: z.string().max(255),
+  description: z.string().optional(),
   attachmentPath: attachmentPathSchema.optional(),
 })
 
-export const updateLabSchema = Joi.object({
-  name: Joi.string().max(255),
-  description: Joi.string().optional(),
+export const updateLabSchema = z.object({
+  name: z.string().max(255).optional(),
+  description: z.string().optional(),
   attachmentPath: attachmentPathSchema.optional(),
-}).min(1)
+  status: z.nativeEnum(LabStatusEnum).optional(),
+})
+
+export type ICreateLab = z.infer<typeof createLabSchema>
+export type IUpdateLab = z.infer<typeof updateLabSchema>

@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { labsController } from './labs.controller'
-import { validateBody } from '@/common/middlewares/validate'
+import { validateBody } from '@/common/middlewares/validateRequest'
 import { createLabSchema, updateLabSchema } from './labs.validator'
 import { authGuard } from '@/common/guard/auth.guard'
 

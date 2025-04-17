@@ -1,6 +1,5 @@
 import { Router } from 'express'
 import { adminsController } from './admins.controller'
-import { validateBody } from '@/common/middlewares/validate' 
 import { authGuard } from '@/common/guard/auth.guard'
 import { permissionGuard } from '@/common/guard/role.guard'
 import { AdminRoleEnum } from '@/common/enum/admin.enum'
@@ -12,7 +11,7 @@ import {
   resetPasswordSchema, 
   querySchema
 } from './admins.validator'
-import { validateQuery } from '@/common/middlewares/validateRequest'
+import { validateQuery, validateBody } from '@/common/middlewares/validateRequest'
 
 const router = Router()
 

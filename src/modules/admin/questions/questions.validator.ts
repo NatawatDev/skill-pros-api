@@ -1,38 +1,19 @@
-import Joi from 'joi'
+import { z } from 'zod'
 
-export interface IQuestion {
-  questionText: string,
-  choices: IChoices[],
-  answer: string,
-  explanation?: string,
-  order: number
-}
-
-interface IChoices {
-  value: 'string',
-  text: 'string'
-}
-
-const choiceSchema = Joi.object({
-  value: Joi.string().required(),
-  text: Joi.string().required()
+const choiceSchema = z.object({
+  value: z.string(),
+  text: z.string(),
 })
 
-const choiceListSchema = Joi.array()
-  .items(choiceSchema)
-  .min(1)
-  .required()
-
-const questionSchema = Joi.object({
-  questionText: Joi.string().required(),
-  choices: choiceListSchema.required(),
-  answer: Joi.string().required(),
-  order: Joi.number().default(0),
-  explanation: Joi.string().optional()
+export const questionSchema = z.object({
+  questionText: z.string(),
+  choices: z.array(choiceSchema).min(1),
+  answer: z.string(),
+  order: z.number().default(0),
+  explanation: z.string().optional(),
 })
 
+export const questionListSchema = z.array(questionSchema).min(1)
 
-export const questionListSchema = Joi.array()
-  .items(questionSchema)
-  .min(1)
-  .required()
+export type IQuestion = z.infer<typeof questionSchema>
+export type IQuestionList = z.infer<typeof questionListSchema>
