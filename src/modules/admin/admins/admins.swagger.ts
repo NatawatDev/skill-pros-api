@@ -187,3 +187,41 @@
  *       200:
  *         description: List of admins
  */
+
+
+//active admin status
+/**
+ * @swagger
+ * /api/admin/admins/active/{id}:
+ *   patch:
+ *     summary: Update admin status to active
+ *     tags: [Admin]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Status updated successfully
+ */
+
+
+//active admin status
+/**
+ * @swagger
+ * /api/admin/admins/suspend/{id}:
+ *   patch:
+ *     summary: Update admin status to suspend
+ *     tags: [Admin]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Status updated successfully
+ */

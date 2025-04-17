@@ -67,11 +67,36 @@ const findAllAdmins = async (req: Request, res: Response, next: NextFunction) =>
 }
 
 
+const activeAdmin = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+
+    const result = await adminsService.activeAdmin(+req.params.id, req.user!.email)
+    
+    res.status(200).json({ success: true, data: result, message: 'Admin status updated successfully.' })
+  } catch (error) {
+    next(error)
+  }
+}
+
+const suspendAdmin = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+
+    const result = await adminsService.suspendAdmin(+req.params.id, req.user!.email)
+    
+    res.status(200).json({ success: true, data: result, message: 'Admin status updated successfully.' })
+  } catch (error) {
+    next(error)
+  }
+}
+
+
 export const adminsController = {
   inviteAdmin,
   setupAccount,
   verifyToken,
   forgetPassword,
   resetPassword,
-  findAllAdmins
+  findAllAdmins,
+  activeAdmin,
+  suspendAdmin
 }

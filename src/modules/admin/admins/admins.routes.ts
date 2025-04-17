@@ -20,6 +20,8 @@ router.post('/invite', authGuard, permissionGuard(AdminRoleEnum.SUPERADMIN), val
 router.post('/setup-password', validateBody(setupPasswordAdminSchema), adminsController.setupAccount)
 router.post('/verify-token', validateBody(verifyTokenSchema) , adminsController.verifyToken)
 router.post('/forget-password', validateBody(forgetPasswordSchema) , adminsController.forgetPassword),
-router.post('/reset-password', validateBody(resetPasswordSchema) , adminsController.resetPassword)
+router.post('/reset-password', validateBody(resetPasswordSchema) , adminsController.resetPassword),
+router.patch('/active/:id', authGuard,  permissionGuard(AdminRoleEnum.SUPERADMIN), adminsController.activeAdmin),
+router.patch('/suspend/:id', authGuard,  permissionGuard(AdminRoleEnum.SUPERADMIN), adminsController.suspendAdmin)
 
 export default router

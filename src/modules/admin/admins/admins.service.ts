@@ -157,6 +157,51 @@ export const findAllAdmins = async (options: IQueryAdmins) => {
   })
 }
 
+export const activeAdmin = async (id:number, updatedBy: string) => {
+  const admin = await adminRepository.findOneBy({ id })
+
+  if (!admin) {
+    throw new NotFoundException('Admin not found.')
+  }
+
+  if (admin.role === AdminRoleEnum.SUPERADMIN) {
+    throw new BadRequestException('Can not change superadmin status.')
+  }
+
+  if (admin.status !== AdminStatusEnum.SUSPEND) {
+    throw new BadRequestException('Admin status is not suspend')
+  }
+
+  return await adminRepository.save({
+    ...admin,
+    status: AdminStatusEnum.ACTIVE,
+    updatedBy
+  })
+}
+
+
+export const suspendAdmin = async (id:number, updatedBy: string) => {
+  const admin = await adminRepository.findOneBy({ id })
+
+  if (!admin) {
+    throw new NotFoundException('Admin not found.')
+  }
+
+  if (admin.role === AdminRoleEnum.SUPERADMIN) {
+    throw new BadRequestException('Can not change superadmin status.')
+  }
+
+  if (admin.status !== AdminStatusEnum.ACTIVE) {
+    throw new BadRequestException('Admin status is not active.')
+  }
+
+  return await adminRepository.save({
+    ...admin,
+    status: AdminStatusEnum.SUSPEND,
+    updatedBy
+  })
+}
+
 
 export const adminsService = {
   inviteAdmin,
@@ -164,5 +209,7 @@ export const adminsService = {
   validateToken,
   sendResetPassword,
   resetPassword,
-  findAllAdmins
+  findAllAdmins,
+  activeAdmin,
+  suspendAdmin
 }
