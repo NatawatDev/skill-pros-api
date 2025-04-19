@@ -1,4 +1,4 @@
-import express, { Request, Response, NextFunction, ErrorRequestHandler } from 'express'
+import express from 'express'
 import helmet from 'helmet'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
@@ -7,7 +7,7 @@ import swaggerUi from 'swagger-ui-express'
 import { createSwaggerSpec } from '@/config/swagger'
 import coreUploadRoutes from '@/modules/core/upload/upload.routes'
 import adminRouter from '@/modules/admin/admin.routes'
-import limiter from '@/common/middlewares/ratelimit'
+import limiter from '@/common/middlewares/rateLimit'
 
 import errorHandler from '@/common/middlewares/error-handler'
 
