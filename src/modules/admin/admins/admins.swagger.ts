@@ -225,3 +225,16 @@
  *       200:
  *         description: Status updated successfully
  */
+
+
+//profile admin
+/**
+ * @swagger
+ * /api/admin/admins/profile:
+ *   get:
+ *     summary: Find admin
+ *     tags: [Admin]
+ *     responses:
+ *       200:
+ *         description: Status updated successfully
+ */

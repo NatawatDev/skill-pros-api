@@ -16,6 +16,7 @@ import { validateQuery, validateBody } from '@/common/middlewares/validateReques
 const router = Router()
 
 router.get('/', authGuard,  validateQuery(querySchema), adminsController.findAllAdmins)
+router.get('/profile', authGuard, adminsController.profileAdmin)
 router.post('/invite', authGuard, permissionGuard(AdminRoleEnum.SUPERADMIN), validateBody(inviteAdminSchema), adminsController.inviteAdmin)
 router.post('/setup-password', validateBody(setupPasswordAdminSchema), adminsController.setupAccount)
 router.post('/verify-token', validateBody(verifyTokenSchema) , adminsController.verifyToken)

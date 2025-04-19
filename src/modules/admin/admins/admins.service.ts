@@ -18,6 +18,27 @@ const config = configuration()
 
 const adminRepository = AppDataSource.getRepository(Admin)
 
+
+const profileAdmin = async (id:number) => {
+  const admin = await adminRepository.findOne({ 
+    where: { id },
+    select: {
+      id: true,
+      firstname: true,
+      lastname: true,
+      email: true,
+      phone: true,
+      createdAt: true
+    } 
+  })
+
+  if (!admin) {
+    throw new NotFoundException('Admin does not found');
+  }
+
+  return admin;
+}
+
 const inviteAdmin = async (req: Request, inviter: JwtPayload) => {
 
   const { email, firstname, lastname } = req.body
@@ -211,5 +232,6 @@ export const adminsService = {
   resetPassword,
   findAllAdmins,
   activeAdmin,
-  suspendAdmin
+  suspendAdmin,
+  profileAdmin
 }

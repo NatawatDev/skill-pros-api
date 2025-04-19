@@ -90,6 +90,17 @@ const suspendAdmin = async (req: Request, res: Response, next: NextFunction) => 
 }
 
 
+const profileAdmin = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+
+    const result = await adminsService.profileAdmin(req.user!.userId)
+    
+    res.status(200).json({ success: true, data: result })
+  } catch (error) {
+    next(error)
+  }
+}
+
 export const adminsController = {
   inviteAdmin,
   setupAccount,
@@ -98,5 +109,6 @@ export const adminsController = {
   resetPassword,
   findAllAdmins,
   activeAdmin,
-  suspendAdmin
+  suspendAdmin,
+  profileAdmin
 }
