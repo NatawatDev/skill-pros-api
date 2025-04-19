@@ -164,7 +164,7 @@ export const findAllAdmins = async (options: IQueryAdmins) => {
 
   const query = adminRepository
     .createQueryBuilder('admin')
-    .orderBy('admin.createdAt', 'DESC')
+    .orderBy('admin.id', 'ASC')
 
   if (searchText) {
     query.andWhere(
