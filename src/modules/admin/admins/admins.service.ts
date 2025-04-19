@@ -28,6 +28,8 @@ const profileAdmin = async (id:number) => {
       lastname: true,
       email: true,
       phone: true,
+      status: true,
+      role: true,
       createdAt: true
     } 
   })
