@@ -8,7 +8,7 @@ const router = Router()
 
 router.post('/login', validateBody(loginAdminSchema), authController.loginAdmin)
 router.post('/logout', authGuard, authController.logoutAdmin)
-router.post('/refresh-token', authGuard, authController.refreshAccessToken)
+router.post('/refresh-token', authController.refreshAccessToken)
 
 
 export default router

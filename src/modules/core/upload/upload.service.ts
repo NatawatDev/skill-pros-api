@@ -18,10 +18,11 @@ export const uploadToS3 = async (file: Express.Multer.File, folder: string) => {
 
   const result = await s3
     .upload({
-      Bucket: `${awsBucketName}/${folder ?? ''}`,
+      Bucket: awsBucketName,
       Key: key,
       Body: file.buffer,
-      ContentType: file.mimetype
+      ContentType: file.mimetype,
+      ACL: 'public-read',
     })
     .promise()
 
